@@ -1,4 +1,4 @@
-package com.ahrokholska.films.ui.theme
+package com.ahrokholska.films.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
