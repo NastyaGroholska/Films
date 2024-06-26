@@ -14,7 +14,9 @@ class FilmsRepositoryImpl @Inject constructor(private val filmsService: FilmsSer
     override suspend fun getTopRatedFilms(): Result<List<Film>> = withContext(Dispatchers.IO) {
         try {
             val response = filmsService.getTopRatedMovies()
-            Result.success(response.results)
+            Result.success(response.results.map {
+                it.copy(posterPath = "https://image.tmdb.org/t/p/w500${it.posterPath}")
+            })
         } catch (e: Exception) {
             when (e) {
                 is IOException, is HttpException -> {
