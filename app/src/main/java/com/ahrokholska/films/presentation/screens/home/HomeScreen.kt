@@ -1,5 +1,8 @@
 package com.ahrokholska.films.presentation.screens.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,16 +31,27 @@ import coil.compose.AsyncImage
 import com.ahrokholska.films.R
 import com.ahrokholska.films.data.Film
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel(), onItemClick: (Int) -> Unit) {
+fun SharedTransitionScope.HomeScreen(
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onItemClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     HomeScreenContent(
         films = viewModel.films.collectAsState().value,
-        onItemClick = onItemClick
+        onItemClick = onItemClick,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreenContent(films: Result<List<Film>>?, onItemClick: (Int) -> Unit = {}) {
+fun SharedTransitionScope.HomeScreenContent(
+    films: Result<List<Film>>?,
+    onItemClick: (Int) -> Unit = {},
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when {
@@ -56,8 +70,15 @@ fun HomeScreenContent(films: Result<List<Film>>?, onItemClick: (Int) -> Unit = {
                                 .clickable { onItemClick(item.id) },
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            var modifier = Modifier.weight(1f)
+                            animatedVisibilityScope?.let {
+                                modifier = modifier.sharedElement(
+                                    state = rememberSharedContentState(key = item.id),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            }
                             AsyncImage(
-                                modifier = Modifier.weight(1f),
+                                modifier = modifier,
                                 model = item.posterPath,
                                 placeholder = rememberVectorPainter(Icons.Default.Close),
                                 contentDescription = null,
@@ -82,20 +103,23 @@ fun HomeScreenContent(films: Result<List<Film>>?, onItemClick: (Int) -> Unit = {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreenContent(
-        films = Result.success(
-            listOf(
-                Film(
-                    id = 1,
-                    posterPath = "",
-                    title = "Hello",
-                    voteAverage = 8.99f,
-                    overview = "Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+    SharedTransitionScope {
+        HomeScreenContent(
+            films = Result.success(
+                listOf(
+                    Film(
+                        id = 1,
+                        posterPath = "",
+                        title = "Hello",
+                        voteAverage = 8.99f,
+                        overview = "Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+                    )
                 )
             )
         )
-    )
+    }
 }

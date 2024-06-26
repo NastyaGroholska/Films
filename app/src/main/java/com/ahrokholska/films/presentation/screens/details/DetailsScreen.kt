@@ -1,5 +1,8 @@
 package com.ahrokholska.films.presentation.screens.details
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,13 +29,24 @@ import coil.compose.AsyncImage
 import com.ahrokholska.films.R
 import com.ahrokholska.films.data.Film
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DetailsScreen(viewModel: DetailsScreenViewModel = hiltViewModel()) {
-    DetailsScreenContent(film = viewModel.film.collectAsState().value)
+fun SharedTransitionScope.DetailsScreen(
+    viewModel: DetailsScreenViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    DetailsScreenContent(
+        film = viewModel.film.collectAsState().value,
+        animatedVisibilityScope = animatedVisibilityScope
+    )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DetailsScreenContent(film: Result<Film>?) {
+fun SharedTransitionScope.DetailsScreenContent(
+    film: Result<Film>?,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when {
@@ -51,8 +65,15 @@ fun DetailsScreenContent(film: Result<Film>?) {
                         item {
                             Text(text = item.title, style = MaterialTheme.typography.titleLarge)
                             Text(text = "${item.voteAverage}")
+                            var modifier = Modifier.fillMaxWidth()
+                            animatedVisibilityScope?.let {
+                                modifier = modifier.sharedElement(
+                                    state = rememberSharedContentState(key = item.id),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            }
                             AsyncImage(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = modifier,
                                 model = item.posterPath,
                                 placeholder = rememberVectorPainter(Icons.Default.Close),
                                 contentDescription = null,
@@ -70,18 +91,21 @@ fun DetailsScreenContent(film: Result<Film>?) {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun DetailsScreenPreview() {
-    DetailsScreenContent(
-        film = Result.success(
-            Film(
-                id = 1,
-                posterPath = "",
-                title = "Hello",
-                voteAverage = 8.99f,
-                overview = "Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+    SharedTransitionScope {
+        DetailsScreenContent(
+            film = Result.success(
+                Film(
+                    id = 1,
+                    posterPath = "",
+                    title = "Hello",
+                    voteAverage = 8.99f,
+                    overview = "Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+                )
             )
         )
-    )
+    }
 }
