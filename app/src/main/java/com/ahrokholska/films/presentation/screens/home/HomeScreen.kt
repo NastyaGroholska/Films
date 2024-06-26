@@ -1,5 +1,6 @@
 package com.ahrokholska.films.presentation.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,14 +29,15 @@ import com.ahrokholska.films.R
 import com.ahrokholska.films.data.Film
 
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
+fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel(), onItemClick: (Int) -> Unit) {
     HomeScreenContent(
-        films = viewModel.films.collectAsState().value
+        films = viewModel.films.collectAsState().value,
+        onItemClick = onItemClick
     )
 }
 
 @Composable
-fun HomeScreenContent(films: Result<List<Film>>?) {
+fun HomeScreenContent(films: Result<List<Film>>?, onItemClick: (Int) -> Unit = {}) {
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when {
@@ -49,7 +51,9 @@ fun HomeScreenContent(films: Result<List<Film>>?) {
                     val items = films.getOrThrow()
                     itemsIndexed(items) { index, item ->
                         Row(
-                            modifier = Modifier.padding(end = 10.dp),
+                            modifier = Modifier
+                                .padding(end = 10.dp)
+                                .clickable { onItemClick(item.id) },
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             AsyncImage(

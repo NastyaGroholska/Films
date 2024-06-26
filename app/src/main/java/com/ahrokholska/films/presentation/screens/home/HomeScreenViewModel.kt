@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(private val getTopRatedFilmsUseCase: GetTopRatedFilmsUseCase) :
+class HomeScreenViewModel @Inject constructor(getTopRatedFilmsUseCase: GetTopRatedFilmsUseCase) :
     ViewModel() {
     private val _films = MutableStateFlow<Result<List<Film>>?>(null)
     val films = _films.asStateFlow()

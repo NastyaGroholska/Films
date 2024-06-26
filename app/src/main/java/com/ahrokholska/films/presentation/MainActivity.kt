@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.ahrokholska.films.presentation.screens.home.HomeScreen
+import com.ahrokholska.films.presentation.navigation.Navigation
 import com.ahrokholska.films.presentation.theme.FilmsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FilmsTheme {
-                HomeScreen()
+                Navigation()
             }
         }
     }
